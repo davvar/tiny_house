@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon src/index.ts",
-    "build": "tsc -p ./"
+    "build": "tsc -p ./",
+    "seed": "ts-node temp/seed.ts",
+    "clear": "ts-node temp/clear.ts"
   },
   "author": "",
   "license": "ISC",
@@ -13,6 +15,7 @@
     "@types/lodash": "^4.14.166",
     "apollo-server-express": "^2.19.1",
     "express": "^4.17.1",
+    "googleapis": "^66.0.0",
     "graphql": "^15.4.0",
     "lodash": "^4.17.20",
     "mongodb": "^3.6.3"
