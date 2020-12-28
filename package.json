@@ -12,8 +12,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/cookie-parser": "^1.4.2",
     "@types/lodash": "^4.14.166",
     "apollo-server-express": "^2.19.1",
+    "cookie-parser": "^1.4.5",
     "express": "^4.17.1",
     "googleapis": "^66.0.0",
     "graphql": "^15.4.0",

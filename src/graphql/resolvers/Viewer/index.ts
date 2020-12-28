@@ -4,11 +4,20 @@ import { Database, IUser, IViewer } from '../../../lib/types'
 import { LogInArgs } from './types'
 import crypto from 'crypto'
 import { get, isEmpty } from 'lodash'
+import { CookieOptions, Request, Response } from 'express'
+
+const cookieOptions: CookieOptions = {
+	httpOnly: true,
+	sameSite: true,
+	signed: true,
+	secure: process.env.NODE_ENV !== 'development',
+}
 
 const logInViaGoogle = async (
 	code: string,
 	token: string,
-	db: Database
+	db: Database,
+	res: Response
 ): Promise<IUser | undefined> => {
 	const user = await Google.logIn(code)
 
@@ -61,6 +70,33 @@ const logInViaGoogle = async (
 		viewer = insertResult.ops[0]
 	}
 
+	const ONE_YEAR = 365 * 24 * 60 * 60 * 1000
+	res.cookie('viewer', id, {
+		...cookieOptions,
+		maxAge: ONE_YEAR,
+	})
+
+	return viewer
+}
+
+const loginViaCookie = async (
+	token: string,
+	db: Database,
+	req: Request,
+	res: Response
+): Promise<IUser | undefined> => {
+	const updatedRes = await db.users.findOneAndUpdate(
+		{ _id: req.signedCookies.viewer },
+		{ $set: { token } },
+		{ returnOriginal: false }
+	)
+
+	const viewer = updatedRes.value
+
+	if (!viewer) {
+		res.clearCookie('viewer', cookieOptions)
+	}
+
 	return viewer
 }
 
@@ -76,19 +112,18 @@ export const viewerResolver: IResolvers = {
 	},
 
 	Mutation: {
-
 		logIn: async (
 			_root: undefined,
 			{ input }: LogInArgs,
-			{ db }: { db: Database }
+			{ db, req, res }: { db: Database; req: Request; res: Response }
 		): Promise<IViewer> => {
 			try {
 				const code = input ? input.code : null
 				const token = crypto.randomBytes(16).toString('hex')
 
 				const viewer: IUser | undefined = code
-					? await logInViaGoogle(code, token, db)
-					: undefined
+					? await logInViaGoogle(code, token, db, res)
+					: await loginViaCookie(token, db, req, res)
 
 				if (!viewer) {
 					return { didRequest: true }
@@ -106,14 +141,18 @@ export const viewerResolver: IResolvers = {
 			}
 		},
 
-		logOut: (): IViewer => {
+		logOut: (
+			_root: undefined,
+			_args: Record<string, never>,
+			{ res }: { res: Response }
+		): IViewer => {
 			try {
+				res.clearCookie('viewer', cookieOptions)
 				return { didRequest: true }
 			} catch (err) {
 				throw new Error(`Failed to log out: ${err}`)
 			}
-    },
-
+		},
 	},
 
 	Viewer: {
