@@ -3,9 +3,9 @@ require('dotenv').config()
 
 import { ObjectId } from 'mongodb';
 import { connectDatabase } from '../src/database'
-import { Listing, ListingType, IUser } from '../src/lib/types'
+import { IListing, ListingType, IUser } from '../src/lib/types'
 
-const listings: Listing[] = [
+const listings:IListing[] = [
 	{
 		_id: new ObjectId('5d378db94e84753160e08b30'),
 		title: 'Clean and fully furnished apartment. 5 min away from CN Tower',
