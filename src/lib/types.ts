@@ -33,7 +33,7 @@ export interface IBooking {
 	checkOut: string
 }
 
-export interface Listing {
+export interface IListing {
 	_id: ObjectID
 	title: string
 	description: string
@@ -63,10 +63,11 @@ export interface IUser {
 	income: number
 	bookings: ObjectId[]
 	listings: ObjectId[]
+	authorized?: boolean
 }
 
-export interface Database {
-	listings: Collection<Listing>
+export interface IDatabase {
+	listings: Collection<IListing>
 	users: Collection<IUser>
 	bookings: Collection<IBooking>
 }

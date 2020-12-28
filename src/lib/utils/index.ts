@@ -1,8 +1,8 @@
 import { Request } from 'express'
-import { Database, IUser } from '../types'
+import { IDatabase, IUser } from '../types'
 
 export const authorize = async (
-	db: Database,
+	db: IDatabase,
 	req: Request
 ): Promise<IUser | null> => {
 	const token = req.get('X-CSRF-TOKEN')

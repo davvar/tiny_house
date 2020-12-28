@@ -1,6 +1,6 @@
 import { IResolvers } from 'apollo-server-express'
 import { Google } from '../../../lib/api'
-import { Database, IUser, IViewer } from '../../../lib/types'
+import { IDatabase, IUser, IViewer } from '../../../lib/types'
 import { LogInArgs } from './types'
 import crypto from 'crypto'
 import { get, isEmpty } from 'lodash'
@@ -16,7 +16,7 @@ const cookieOptions: CookieOptions = {
 const logInViaGoogle = async (
 	code: string,
 	token: string,
-	db: Database,
+	db: IDatabase,
 	res: Response
 ): Promise<IUser | undefined> => {
 	const user = await Google.logIn(code)
@@ -81,7 +81,7 @@ const logInViaGoogle = async (
 
 const loginViaCookie = async (
 	token: string,
-	db: Database,
+	db: IDatabase,
 	req: Request,
 	res: Response
 ): Promise<IUser | undefined> => {
@@ -115,7 +115,7 @@ export const viewerResolver: IResolvers = {
 		logIn: async (
 			_root: undefined,
 			{ input }: LogInArgs,
-			{ db, req, res }: { db: Database; req: Request; res: Response }
+			{ db, req, res }: { db: IDatabase; req: Request; res: Response }
 		): Promise<IViewer> => {
 			try {
 				const code = input ? input.code : null
