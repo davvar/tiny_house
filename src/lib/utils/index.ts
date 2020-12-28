@@ -12,5 +12,5 @@ export const authorize = async (
 		token,
 	})
 
-	return viewer
+	return viewer;
 }
