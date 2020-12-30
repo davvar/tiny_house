@@ -48,9 +48,7 @@ export interface IListing {
 	bookingsIndex: IBookingIndex
 	price: number
 	numOfGuests: number
-	// numOfBeds: number
-	// numOfBaths: number
-	// rating: number
+	authorized: boolean
 }
 
 export interface IUser {
