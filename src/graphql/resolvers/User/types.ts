@@ -4,7 +4,7 @@ export interface IUserArgs {
 	id: string
 }
 
-interface IPaginationArgs {
+export interface IPaginationArgs {
 	limit: number
 	page: number
 }
