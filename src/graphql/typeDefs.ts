@@ -1,7 +1,6 @@
-import { gql } from 'apollo-server-express'
+import { gql } from 'apollo-server-express';
 
 export const typeDefs = gql`
-
 	type Booking {
 		id: ID!
 		listing: Listing!
@@ -18,6 +17,11 @@ export const typeDefs = gql`
 	enum ListingType {
 		APARTMENT
 		HOUSE
+	}
+
+	enum ListingsFilter {
+		PRICE_LOW_TO_HIGH
+		PRICE_HIGH_TO_LOW
 	}
 
 	type Listing {
@@ -67,6 +71,7 @@ export const typeDefs = gql`
 		authUrl: String!
 		user(id: ID!): User!
 		listing(id: ID!): Listing!
+		listings(filter: ListingsFilter!, page: Int!, limit: Int!): [Listing!]!
 	}
 
 	type Mutation {

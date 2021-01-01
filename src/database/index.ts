@@ -1,5 +1,5 @@
-import { MongoClient } from 'mongodb'
-import { IDatabase, IBooking, IUser, IListing } from '../lib/types'
+import { MongoClient } from 'mongodb';
+import { IBooking, IDatabase, IListing, IUser } from '../typings';
 
 const url = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_USER_PASSWORD}@${process.env.DB_CLUSTER}.mongodb.net/tiny-house?retryWrites=true&w=majority`
 

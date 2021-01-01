@@ -1,10 +1,9 @@
-import { Request } from 'express'
-import { IDatabase, IUser } from '../types'
+import { IContext, IPaginationArgs, IUser } from '../../typings';
 
-export const authorize = async (
-	db: IDatabase,
-	req: Request
-): Promise<IUser | null> => {
+export const authorize = async ({
+	db,
+	req,
+}: Omit<IContext, 'res'>): Promise<IUser | null> => {
 	const token = req.get('X-CSRF-TOKEN')
 
 	const viewer = await db.users.findOne({
@@ -12,5 +11,8 @@ export const authorize = async (
 		token,
 	})
 
-	return viewer;
+	return viewer
 }
+
+export const getPageToSkip = ({ page, limit }: IPaginationArgs) =>
+	page > 0 ? (page - 1) * limit : 0

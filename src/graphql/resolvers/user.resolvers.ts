@@ -1,30 +1,23 @@
-import { IResolvers } from 'apollo-server-express'
-import { Request } from 'express'
-import { IDatabase, IUser } from '../../../lib/types'
-import { authorize } from '../../../lib/utils'
-import {
-	IUserArgs,
-	IUserBookingsArgs,
-	IUserBookingsData,
-	IUserListingsArgs,
-	IUserListingsData,
-} from './types'
+import { IResolvers } from 'apollo-server-express';
+import { authorize, getPageToSkip } from '../../lib/utils';
+import errorHandler from '../../lib/utils/errorHandler';
+import { IBooking, IContext, IList, IListing, IPaginationArgs, IUser } from '../../typings';
 
-export const userResolver: IResolvers = {
+export const userResolvers: IResolvers = {
 	Query: {
 		user: async (
 			_root: undefined,
-			{ id }: IUserArgs,
-			{ db, req }: { db: IDatabase; req: Request }
+			{ id }: { id: string },
+			{ db, req }: IContext
 		): Promise<IUser> => {
 			try {
-				const user = await db.users.findOne({ _id: id })
+				const user = await db.users.findOne<IUser>({ _id: id })
 
 				if (!user) {
 					throw new Error("User can't be found")
 				}
 
-				const viewer = await authorize(db, req)
+				const viewer = await authorize({ db, req })
 				if (viewer && viewer._id === user._id) {
 					user.authorized = true
 				}
@@ -34,7 +27,7 @@ export const userResolver: IResolvers = {
 				throw new Error(`Failed to query user: ${error}`)
 			}
 		},
-  },
+	},
 
 	User: {
 		id: ({ _id }: IUser): string => _id,
@@ -44,51 +37,51 @@ export const userResolver: IResolvers = {
 		},
 		bookings: async (
 			user: IUser,
-			{ limit, page }: IUserBookingsArgs,
-			{ db }: { db: IDatabase }
-		): Promise<IUserBookingsData | null> => {
+			{ limit, page }: IPaginationArgs,
+			{ db }: IContext
+		): Promise<IList<IBooking> | null> => {
 			try {
 				if (!user.authorized) {
 					return null
 				}
 
-				const data: IUserBookingsData = {
+				const data: IList<IBooking> = {
 					total: 0,
 					result: [],
 				}
 
-				const cursor = await db.bookings.find({
+				let cursor = await db.bookings.find<IBooking>({
 					_id: { $in: user.bookings },
 				})
 
-				cursor.skip(page > 0 ? (page - 1) * limit : 0)
-				cursor.limit(limit)
+				cursor = cursor.skip(getPageToSkip({ page, limit }))
+				cursor = cursor.limit(limit)
 
 				data.total = await cursor.count()
 				data.result = await cursor.toArray()
 
 				return data
 			} catch (error) {
-				throw new Error(`Failed to query user bookings ${error}`)
+				errorHandler({ error, msg: 'user bookings' })
 			}
 		},
 		listings: async (
 			user: IUser,
-			{ limit, page }: IUserListingsArgs,
-			{ db }: { db: IDatabase }
-		): Promise<IUserListingsData | null> => {
+			{ limit, page }: IPaginationArgs,
+			{ db }: IContext
+		): Promise<IList<IListing> | null> => {
 			try {
-				const data: IUserListingsData = {
+				const data: IList<IListing> = {
 					total: 0,
 					result: [],
 				}
 
-				const cursor = await db.listings.find({
+				let cursor = await db.listings.find<IListing>({
 					_id: { $in: user.listings },
 				})
 
-				cursor.skip(page > 0 ? (page - 1) * limit : 0)
-				cursor.limit(limit)
+				cursor = cursor.skip(getPageToSkip({page, limit}))
+				cursor = cursor.limit(limit)
 
 				data.total = await cursor.count()
 				data.result = await cursor.toArray()

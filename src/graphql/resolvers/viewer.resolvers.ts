@@ -1,10 +1,9 @@
-import { IResolvers } from 'apollo-server-express'
-import { Google } from '../../../lib/api'
-import { IDatabase, IUser, IViewer } from '../../../lib/types'
-import { LogInArgs } from './types'
-import crypto from 'crypto'
-import { get, isEmpty } from 'lodash'
-import { CookieOptions, Request, Response } from 'express'
+import { IResolvers } from 'apollo-server-express';
+import crypto from 'crypto';
+import { CookieOptions, Request, Response } from 'express';
+import { get, isEmpty } from 'lodash';
+import { Google } from '../../lib/api';
+import { IContext, IDatabase, IEmptyObject, IUser, IViewer, LogInArgs } from '../../typings';
 
 const cookieOptions: CookieOptions = {
 	httpOnly: true,
@@ -100,7 +99,7 @@ const loginViaCookie = async (
 	return viewer
 }
 
-export const viewerResolver: IResolvers = {
+export const viewerResolvers: IResolvers = {
 	Query: {
 		authUrl: (): string => {
 			try {
@@ -143,8 +142,8 @@ export const viewerResolver: IResolvers = {
 
 		logOut: (
 			_root: undefined,
-			_args: Record<string, never>,
-			{ res }: { res: Response }
+			_args: IEmptyObject,
+			{ res }: IContext
 		): IViewer => {
 			try {
 				res.clearCookie('viewer', cookieOptions)

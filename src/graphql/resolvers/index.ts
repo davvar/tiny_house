@@ -1,12 +1,12 @@
-import { merge } from 'lodash'
-import { bookingResolver } from './Bookings/bookings.resolver'
-import { listingResolver } from './Listings/listings.resolver'
-import { userResolver } from './User/user.resolver'
-import { viewerResolver } from './Viewer/viewer.resolver'
+import { merge } from 'lodash';
+import { bookingResolvers } from './bookings.resolvers';
+import { listingResolvers } from './listings.resolvers';
+import { userResolvers } from './user.resolvers';
+import { viewerResolvers } from './viewer.resolvers';
 
 export const resolvers = merge(
-	viewerResolver,
-	userResolver,
-	listingResolver,
-	bookingResolver
+	viewerResolvers,
+	userResolvers,
+	listingResolvers,
+	bookingResolvers
 )

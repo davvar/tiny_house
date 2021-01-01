@@ -1,12 +1,12 @@
+// eslint-disable-next-line
+require('dotenv').config()
 import { ApolloServer } from 'apollo-server-express';
 import cookieParser from 'cookie-parser';
-import dotenv from 'dotenv';
 import express, { Application } from 'express';
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
 import { connectDatabase } from './database';
 import { resolvers, typeDefs } from './graphql';
-import { IDatabase } from './lib/types';
-dotenv.config()
+import { IContext, IDatabase } from './typings';
 
 const mount = async (app: Application) => {
 	const db: IDatabase = await connectDatabase()
@@ -17,8 +17,9 @@ const mount = async (app: Application) => {
 	const server = new ApolloServer({
 		typeDefs,
 		resolvers,
-		context: ({ req, res }) => ({ db, req, res }),
+		context: ({ req, res }): IContext => ({ db, req, res }),
 	})
+
 	server.applyMiddleware({ app, path: '/api' })
 
 	app.listen(process.env.PORT)
