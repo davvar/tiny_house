@@ -1,17 +1,18 @@
-import dotenv from 'dotenv'
+import { ApolloServer } from 'apollo-server-express';
+import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv';
+import express, { Application } from 'express';
+import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
+import { connectDatabase } from './database';
+import { resolvers, typeDefs } from './graphql';
+import { IDatabase } from './lib/types';
 dotenv.config()
-
-import express, { Application } from 'express'
-import { ApolloServer } from 'apollo-server-express'
-import { typeDefs, resolvers } from './graphql'
-import { connectDatabase } from './database'
-import { IDatabase } from './lib/types'
-import cookieParser from 'cookie-parser'
 
 const mount = async (app: Application) => {
 	const db: IDatabase = await connectDatabase()
 
 	app.use(cookieParser(process.env.SECRET))
+	app.use('/voyager', voyagerMiddleware({ endpointUrl: '/api' }))
 
 	const server = new ApolloServer({
 		typeDefs,
