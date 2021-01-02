@@ -3,7 +3,16 @@ import { isEqual } from 'lodash';
 import { ObjectId } from 'mongodb';
 import { authorize, getPageToSkip } from '../../lib/utils';
 import errorHandler from '../../lib/utils/errorHandler';
-import { IBooking, IContext, IEmptyObject, IList, IListing, IPaginationArgs, IUser, ListingsFilter } from '../../typings';
+import {
+	IBooking,
+	IContext,
+	IEmptyObject,
+	IList,
+	IListing,
+	IPaginationArgs,
+	IUser,
+	ListingsFilter
+} from '../../typings';
 
 export const listingResolvers: IResolvers = {
 	Query: {
@@ -105,7 +114,7 @@ export const listingResolvers: IResolvers = {
 					_id: { $in: listing.bookings },
 				})
 
-				cursor = cursor.skip(getPageToSkip({page, limit}))
+				cursor = cursor.skip(getPageToSkip({ page, limit }))
 				cursor = cursor.limit(limit)
 
 				data.total = await cursor.count()
