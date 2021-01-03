@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { IResolvers } from 'apollo-server-express';
 import { isEqual } from 'lodash';
 import { ObjectId } from 'mongodb';
+import { Google } from '../../lib/api';
 import { authorize, getPageToSkip } from '../../lib/utils';
 import errorHandler from '../../lib/utils/errorHandler';
 import {
@@ -9,6 +11,9 @@ import {
 	IEmptyObject,
 	IList,
 	IListing,
+	IListingsArgs,
+	IListingsData,
+	IListingsQuery,
 	IPaginationArgs,
 	IUser,
 	ListingsFilter
@@ -40,16 +45,31 @@ export const listingResolvers: IResolvers = {
 		},
 		listings: async (
 			_root: undefined,
-			{ filter, limit, page }: IPaginationArgs & { filter: ListingsFilter },
+			{ location, filter, limit, page }: IListingsArgs,
 			{ db }: IContext
-		): Promise<IList<IListing>> => {
+		): Promise<IListingsData> => {
 			try {
-				const data: IList<IListing> = {
+				const query: IListingsQuery = {}
+				const data: IListingsData = {
+					region: null,
 					total: 0,
 					result: [],
 				}
 
-				let cursor = await db.listings.find<IListing>({})
+				if (location) {
+					const { admin, city, country } = await Google.geocode(location)
+					if (admin) query.admin = admin!
+					if (city) query.city = city!
+
+					if (country) query.country = country!
+					else throw new Error('no country found')
+
+					data.region = `${city ? `${city},` : ''}${admin ? ` ${admin},` : ''} ${
+						country || ''
+					}`
+				}
+
+				let cursor = await db.listings.find<IListing>(query)
 
 				if (isEqual(filter, ListingsFilter.PRICE_LOW_TO_HIGH)) {
 					cursor = cursor.sort({ price: 1 })

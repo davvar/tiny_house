@@ -68,6 +68,21 @@ export interface LogInArgs {
 	input: { code: string } | null
 }
 
+export interface IListingsArgs extends IPaginationArgs {
+	filter: ListingsFilter
+	location?: string
+}
+
+export interface IListingsQuery {
+	country?: string
+	admin?: string
+	city?: string
+}
+
+export interface IListingsData extends IList<IListing> {
+	region: string | null
+}
+
 export interface IDatabase {
 	listings: Collection<IListing>
 	users: Collection<IUser>
