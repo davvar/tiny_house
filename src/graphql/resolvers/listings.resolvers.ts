@@ -64,9 +64,9 @@ export const listingResolvers: IResolvers = {
 					if (country) query.country = country!
 					else throw new Error('no country found')
 
-					data.region = `${city ? `${city},` : ''}${admin ? ` ${admin},` : ''} ${
+					data.region = `"${city ? `${city},` : ''}${admin ? ` ${admin},` : ''} ${
 						country || ''
-					}`
+					}"`
 				}
 
 				let cursor = await db.listings.find<IListing>(query)
