@@ -1,4 +1,4 @@
-import { gql } from 'apollo-server-express';
+import { gql } from 'apollo-server-express'
 
 export const typeDefs = gql`
 	type Booking {
@@ -82,8 +82,14 @@ export const typeDefs = gql`
 		): Listings!
 	}
 
+	input ConnectStripeInput {
+		code: String!
+	}
+
 	type Mutation {
 		logIn(input: LogInInput): Viewer!
 		logOut: Viewer!
+		connectStripe(input: ConnectStripeInput!): Viewer!
+		disconnectStripe: Viewer!
 	}
 `

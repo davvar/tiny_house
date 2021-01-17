@@ -1,9 +1,18 @@
-import { IResolvers } from 'apollo-server-express';
-import crypto from 'crypto';
-import { CookieOptions, Request, Response } from 'express';
-import { get, isEmpty } from 'lodash';
-import { Google } from '../../lib/api';
-import { IContext, IDatabase, IEmptyObject, IUser, IViewer, LogInArgs } from '../../typings';
+import { IResolvers } from 'apollo-server-express'
+import crypto from 'crypto'
+import { CookieOptions, Request, Response } from 'express'
+import { get, isEmpty } from 'lodash'
+import { Google, Stripe, updateWalletId } from '../../lib/api'
+import { authorize } from '../../lib/utils'
+import {
+	ConnectStripeArgs,
+	IContext,
+	IDatabase,
+	IEmptyObject,
+	IUser,
+	IViewer,
+	LogInArgs,
+} from '../../typings'
 
 const cookieOptions: CookieOptions = {
 	httpOnly: true,
@@ -152,10 +161,61 @@ export const viewerResolvers: IResolvers = {
 				throw new Error(`Failed to log out: ${err}`)
 			}
 		},
+
+		connectStripe: async (
+			_root: undefined,
+			{ input }: ConnectStripeArgs,
+			{ db, req }: IContext
+		): Promise<IViewer> => {
+			try {
+				const { code } = input
+
+
+				const viewer = await authorize({ db, req })
+				console.log({ viewer }, !viewer);
+				if (!viewer) {
+					throw new Error('viewer cannot be found')
+				}
+
+				const wallet = await Stripe.connect(code)
+				if (!wallet) {
+					throw new Error('Stripe grant error')
+				}
+
+				return await updateWalletId({
+					db,
+					walletId: wallet.stripe_user_id as string,
+					viewerId: viewer._id,
+				})
+			} catch (error) {
+				throw new Error(`Failed to connect to Stripe ${error}`)
+			}
+		},
+
+		disconnectStripe: async (
+			_root: undefined,
+			_args: IEmptyObject,
+			{ db, req }: IContext
+		): Promise<IViewer> => {
+			try {
+				const viewer = await authorize({ db, req })
+				if (!viewer) {
+					throw new Error('viewer cannot be found')
+				}
+
+				return await updateWalletId({
+					db,
+					viewerId: viewer._id,
+				})
+			} catch (error) {
+				throw new Error(`Failed to disconnect to Stripe ${error}`)
+			}
+		},
 	},
 
 	Viewer: {
 		id: (viewer: IViewer): string | undefined => viewer._id,
+
 		hasWallet: (viewer: IViewer): boolean | undefined => {
 			return viewer.walletId ? true : undefined
 		},
