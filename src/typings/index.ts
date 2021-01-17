@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
-import { Collection, ObjectID } from 'mongodb';
+import { Request, Response } from 'express'
+import { Collection, ObjectID } from 'mongodb'
 
 export interface IViewer {
 	_id?: string
@@ -106,3 +106,7 @@ export enum ListingsFilter {
 }
 
 export type IEmptyObject = Record<string, never>
+
+export interface ConnectStripeArgs {
+	input: { code: string }
+}
