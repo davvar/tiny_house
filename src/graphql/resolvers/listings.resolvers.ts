@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { IResolvers } from 'apollo-server-express';
-import { isEqual } from 'lodash';
-import { ObjectId } from 'mongodb';
-import { Google } from '../../lib/api';
-import { authorize, getPageToSkip } from '../../lib/utils';
-import errorHandler from '../../lib/utils/errorHandler';
+import { IResolvers } from 'apollo-server-express'
+import { isEqual } from 'lodash'
+import { ObjectId } from 'mongodb'
+import { Google } from '../../lib/api'
+import { authorize, getPageToSkip } from '../../lib/utils'
+import errorHandler from '../../lib/utils/errorHandler'
 import {
 	IBooking,
 	IContext,
 	IEmptyObject,
+	IHostListingsArgs,
+	IHostListingsInput,
 	IList,
 	IListing,
 	IListingsArgs,
@@ -16,10 +18,73 @@ import {
 	IListingsQuery,
 	IPaginationArgs,
 	IUser,
-	ListingsFilter
-} from '../../typings';
+	ListingsFilter,
+	ListingType,
+} from '../../typings'
+
+const verifyHostListingInput = ({
+	title,
+	description,
+	type,
+	price,
+}: IHostListingsInput) => {
+	if (title.length > 100) {
+		throw new Error('listing title must be under 100 characters')
+	}
+
+	if (description.length > 5000) {
+		throw new Error('listing description must be under 5000 characters')
+	}
+
+	if (type !== ListingType.Apartment && type !== ListingType.House) {
+		throw new Error('listing type must be either house or apartment')
+	}
+
+	if (price <= 0) {
+		throw new Error('price must be greater then 0')
+	}
+}
 
 export const listingResolvers: IResolvers = {
+	Mutation: {
+		hostListing: async (
+			_root: undefined,
+			{ input }: IHostListingsArgs,
+			{ db, req }: IContext
+		): Promise<IListing> => {
+			verifyHostListingInput(input)
+
+			const viewer = await authorize({ req, db })
+			if (!viewer) {
+				throw new Error('viewer cannot be found')
+			}
+
+			const { admin, city, country } = await Google.geocode(input.address)
+			if (!admin || !city || !country) {
+				throw new Error('invalid address input')
+			}
+
+			const insertResult = await db.listings.insertOne({
+				_id: new ObjectId(),
+				...input,
+				bookings: [],
+				bookingsIndex: {},
+				country: country!,
+				city: city!,
+				admin: admin!,
+				host: viewer._id,
+			})
+
+			const insertedListing: IListing = insertResult.ops[0]
+
+			await db.users.findOneAndUpdate(
+				{ _id: viewer._id },
+				{ $push: { listings: insertedListing._id } }
+			)
+
+			return insertedListing
+		},
+	},
 	Query: {
 		listing: async (
 			_root: undefined,
@@ -64,9 +129,9 @@ export const listingResolvers: IResolvers = {
 					if (country) query.country = country!
 					else throw new Error('no country found')
 
-					data.region = `"${city ? `${city},` : ''}${admin ? ` ${admin},` : ''} ${
-						country || ''
-					}"`
+					data.region = `"${city ? `${city},` : ''}${
+						admin ? ` ${admin},` : ''
+					} ${country || ''}"`
 				}
 
 				let cursor = await db.listings.find<IListing>(query)
