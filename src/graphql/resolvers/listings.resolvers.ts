@@ -2,7 +2,7 @@
 import { IResolvers } from 'apollo-server-express'
 import { isEqual } from 'lodash'
 import { ObjectId } from 'mongodb'
-import { Google } from '../../lib/api'
+import { Cloudinary, Google } from '../../lib/api'
 import { authorize, getPageToSkip } from '../../lib/utils'
 import errorHandler from '../../lib/utils/errorHandler'
 import {
@@ -64,9 +64,12 @@ export const listingResolvers: IResolvers = {
 				throw new Error('invalid address input')
 			}
 
+			const imageUrl = await Cloudinary.upload(input.image)
+
 			const insertResult = await db.listings.insertOne({
 				_id: new ObjectId(),
 				...input,
+				image: imageUrl,
 				bookings: [],
 				bookingsIndex: {},
 				country: country!,
