@@ -51,7 +51,7 @@ export interface IListing {
 	}
 	price: number
 	numOfGuests: number
-	authorized: boolean
+	authorized?: boolean
 }
 
 export interface IList<T> {
@@ -109,4 +109,18 @@ export type IEmptyObject = Record<string, never>
 
 export interface ConnectStripeArgs {
 	input: { code: string }
+}
+
+export interface IHostListingsInput {
+	title: string
+	description: string
+	image: string
+	address: string
+	type: ListingType
+	price: number
+	numOfGuests: number
+}
+
+export interface IHostListingsArgs {
+	input: IHostListingsInput
 }
