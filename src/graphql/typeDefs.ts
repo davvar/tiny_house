@@ -70,18 +70,6 @@ export const typeDefs = gql`
 		code: String!
 	}
 
-	type Query {
-		authUrl: String!
-		user(id: ID!): User!
-		listing(id: ID!): Listing!
-		listings(
-			location: String
-			filter: ListingsFilter!
-			page: Int!
-			limit: Int!
-		): Listings!
-	}
-
 	input ConnectStripeInput {
 		code: String!
 	}
@@ -94,6 +82,18 @@ export const typeDefs = gql`
 		type: ListingType!
 		price: Int!
 		numOfGuests: Int!
+	}
+
+	type Query {
+		authUrl: String!
+		user(id: ID!): User!
+		listing(id: ID!): Listing!
+		listings(
+			location: String
+			filter: ListingsFilter!
+			page: Int!
+			limit: Int!
+		): Listings!
 	}
 
 	type Mutation {
