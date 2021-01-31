@@ -27,7 +27,8 @@
     "graphql": "^15.4.0",
     "graphql-voyager": "^1.0.0-rc.31",
     "lodash": "^4.17.20",
-    "mongodb": "^3.6.3"
+    "mongodb": "^3.6.3",
+    "stripe": "^8.132.0"
   },
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
