@@ -84,6 +84,13 @@ export const typeDefs = gql`
 		numOfGuests: Int!
 	}
 
+	input CreateBookingInput {
+		id: ID!
+		source: String!
+		checkIn: String!
+		checkOut: String!
+	}
+
 	type Query {
 		authUrl: String!
 		user(id: ID!): User!
@@ -94,6 +101,7 @@ export const typeDefs = gql`
 			page: Int!
 			limit: Int!
 		): Listings!
+		createBooking(input: CreateBookingInput!): Booking!
 	}
 
 	type Mutation {
