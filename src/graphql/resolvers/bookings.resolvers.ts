@@ -8,9 +8,10 @@ import {
 	ICreateBookingArgs,
 	IEmptyObject,
 	IListing,
+	IUser,
 } from '../../typings'
 
-const MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24
+export const MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24
 
 export const bookingResolvers: IResolvers = {
 	Mutation: {
@@ -100,12 +101,21 @@ export const bookingResolvers: IResolvers = {
 
 	Booking: {
 		id: (booking: IBooking): string => booking._id.toString(),
+
 		listing: (
 			booking: IBooking,
 			_args: IEmptyObject,
 			{ db }: IContext
 		): Promise<IListing | null> => {
 			return db.bookings.findOne<IListing>({ _id: booking.listing })
+		},
+
+		tenant: (
+			booking: IBooking,
+			_args: IEmptyObject,
+			{ db }: IContext
+		): Promise<IUser | null> => {
+			return db.users.findOne({ _id: booking.tenant })
 		},
 	},
 }
