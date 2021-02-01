@@ -101,7 +101,6 @@ export const typeDefs = gql`
 			page: Int!
 			limit: Int!
 		): Listings!
-		createBooking(input: CreateBookingInput!): Booking!
 	}
 
 	type Mutation {
@@ -110,5 +109,6 @@ export const typeDefs = gql`
 		connectStripe(input: ConnectStripeInput!): Viewer!
 		disconnectStripe: Viewer!
 		hostListing(input: HostListingInput!): Listing!
+		createBooking(input: CreateBookingInput!): Booking!
 	}
 `
