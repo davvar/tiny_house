@@ -170,9 +170,7 @@ export const viewerResolvers: IResolvers = {
 			try {
 				const { code } = input
 
-
-				const viewer = await authorize({ db, req })
-				console.log({ viewer }, !viewer);
+				const viewer = await db.users.findOne({ _id: req.signedCookies.viewer })
 				if (!viewer) {
 					throw new Error('viewer cannot be found')
 				}
