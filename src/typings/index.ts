@@ -30,6 +30,14 @@ export interface IBooking {
 	checkOut: string
 }
 
+export interface IBookingsIndex {
+	[year: string]: {
+		[month: string]: {
+			[day: string]: boolean
+		}
+	}
+}
+
 export interface IListing {
 	_id: ObjectID
 	title: string
@@ -42,13 +50,7 @@ export interface IListing {
 	admin: string
 	city: string
 	bookings: IBooking['_id'][]
-	bookingsIndex: {
-		[year: string]: {
-			[month: string]: {
-				[day: string]: boolean
-			}
-		}
-	}
+	bookingsIndex: IBookingsIndex
 	price: number
 	numOfGuests: number
 	authorized?: boolean
@@ -123,4 +125,15 @@ export interface IHostListingsInput {
 
 export interface IHostListingsArgs {
 	input: IHostListingsInput
+}
+
+export interface ICreateBookingArgs {
+	input: ICreateBookingInput
+}
+
+export interface ICreateBookingInput {
+	id: string
+	source: string
+	checkIn: string
+	checkOut: string
 }
