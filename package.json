@@ -7,13 +7,6 @@
     "node": "12.18.3"
   },
   "scripts": {
-    "build": "tsc -p ./",
-    "server": "nodemon src/server.ts",
-    "client-install": "npm install --prefix client",
-    "client": "npm run start --prefix client",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "seed": "ts-node temp/seed.ts",
-    "clear": "ts-node temp/clear.ts",
     "start": "node build/index.js"
   },
   "heroku-run-build-script": false,
