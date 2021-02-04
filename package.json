@@ -11,7 +11,7 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "seed": "ts-node temp/seed.ts",
     "clear": "ts-node temp/clear.ts",
-    "start": "node build/index.js"
+    "heroku-postbuild": "node build/index.js"
   },
   "author": "",
   "license": "ISC",
